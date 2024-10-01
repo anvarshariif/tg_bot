@@ -47,6 +47,8 @@ public class BotController {
                 acceptUserIdAndAskPost(tgUser,data);
             } else if (tgUser.getState().equals(TgState.SELECT_POST)){
                 acceptPostIdAndAskComment(tgUser,data);
+            } else if (tgUser.getState().equals(TgState.SELECT_COMMENT)){
+                acceptStartAndAskUser(tgUser);
             }
         }
     }

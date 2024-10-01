@@ -36,29 +36,40 @@ public class BotService {
         telegramBot.execute(sendMessage);
         tgUser.setState(TgState.SELECT_USER);
     }
-
+    public static void acceptUserIdAndAskPost(TgUser tgUser, String dataUSerId) {
+        if (dataUSerId.equals("orqaga")){
+            acceptStartAndAskUser(tgUser);
+            return;
+        }
+        String userId = dataUSerId.split("/")[1];
+        SendMessage sendMessage=new SendMessage(tgUser.getChatId(),"posts:");
+        sendMessage.replyMarkup(generatePostsForUserButtons(Integer.parseInt(userId)));
+        telegramBot.execute(sendMessage);
+        tgUser.setState(TgState.SELECT_POST);
+    }
+    public static void acceptPostIdAndAskComment(TgUser tgUser, String dataPostId) {
+        if (dataPostId.equals("orqaga")){
+            acceptStartAndAskUser(tgUser);
+            return;
+        }
+        String postId = dataPostId.split("/")[1];
+        SendMessage sendMessage=new SendMessage(tgUser.getChatId(),"comments:");
+        sendMessage.replyMarkup(generateCommentsForPostButtons(Integer.parseInt(postId)));
+        telegramBot.execute(sendMessage);
+        tgUser.setState(TgState.SELECT_COMMENT);
+    }
     private static InlineKeyboardMarkup generateUsersButtons() {
         List<User> userList = DB.loadUser();
         InlineKeyboardMarkup inlineKeyboardMarkup=new InlineKeyboardMarkup();
         for (User user : userList) {
             inlineKeyboardMarkup.addRow(
-              new InlineKeyboardButton(user.getName()).callbackData(user.getId().toString()),
-              new InlineKeyboardButton("Posts").callbackData("userId/"+user.getId().toString())
+                    new InlineKeyboardButton(user.getName()).callbackData(user.getId().toString()),
+                    new InlineKeyboardButton("Posts").callbackData("userId/"+user.getId().toString())
             );
         }
         return inlineKeyboardMarkup;
     }
-    private static InlineKeyboardMarkup generatePostsForUserButtons(Integer userId){
-        List<Post> posts = DB.loadPost().stream().filter(post -> post.getUserId().equals(userId)).toList();
-        InlineKeyboardMarkup inlineKeyboardMarkup=new InlineKeyboardMarkup();
-        for (Post post : posts) {
-            inlineKeyboardMarkup.addRow(
-                    new InlineKeyboardButton(post.getTitle()).callbackData(post.getId().toString()),
-                    new InlineKeyboardButton("Comments").callbackData("postId/"+post.getId().toString())
-            );
-        }
-        return inlineKeyboardMarkup;
-    }
+
     private static InlineKeyboardMarkup generateCommentsForPostButtons(Integer postId){
         List<Comment> comments = DB.loadComment().stream().filter(comment -> comment.getPostId().equals(postId)).toList();
 
@@ -68,22 +79,20 @@ public class BotService {
                     new InlineKeyboardButton(comment.getName()).callbackData(comment.getId().toString())
             );
         }
+        inlineKeyboardMarkup.addRow(new InlineKeyboardButton("back").callbackData("orqaga"));
         return inlineKeyboardMarkup;
     }
 
-    public static void acceptUserIdAndAskPost(TgUser tgUser, String data) {
-        String userId = data.split("/")[1];
-        SendMessage sendMessage=new SendMessage(tgUser.getChatId(),"posts:");
-        sendMessage.replyMarkup(generatePostsForUserButtons(Integer.parseInt(userId)));
-        telegramBot.execute(sendMessage);
-        tgUser.setState(TgState.SELECT_POST);
-    }
-
-    public static void acceptPostIdAndAskComment(TgUser tgUser, String data) {
-        String postId = data.split("/")[1];
-        SendMessage sendMessage=new SendMessage(tgUser.getChatId(),"comments:");
-        sendMessage.replyMarkup(generateCommentsForPostButtons(Integer.parseInt(postId)));
-        telegramBot.execute(sendMessage);
-        tgUser.setState(TgState.SELECT_COMMENT);
+    private static InlineKeyboardMarkup generatePostsForUserButtons(Integer userId){
+        List<Post> posts = DB.loadPost().stream().filter(post -> post.getUserId().equals(userId)).toList();
+        InlineKeyboardMarkup inlineKeyboardMarkup=new InlineKeyboardMarkup();
+        for (Post post : posts) {
+            inlineKeyboardMarkup.addRow(
+                    new InlineKeyboardButton(post.getTitle()).callbackData(post.getId().toString()),
+                    new InlineKeyboardButton("Comments").callbackData("postId/"+post.getId().toString())
+            );
+        }
+        inlineKeyboardMarkup.addRow(new InlineKeyboardButton("back").callbackData("orqaga"));
+        return inlineKeyboardMarkup;
     }
 }
