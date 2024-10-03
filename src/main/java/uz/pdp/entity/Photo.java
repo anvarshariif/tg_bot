@@ -7,10 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Comment {
+public class Photo {
     private Integer id;
-    private Integer postId;
-    private String name;
-    private String body;
-    private String email;
+    private Integer albumId;
+    private String title;
+    private String url;
 }

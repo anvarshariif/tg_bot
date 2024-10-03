@@ -47,8 +47,14 @@ public class BotController {
                 acceptUserIdAndAskPost(tgUser,data);
             } else if (tgUser.getState().equals(TgState.SELECT_POST)){
                 acceptPostIdAndAskComment(tgUser,data);
-            } else if (tgUser.getState().equals(TgState.SELECT_COMMENT)){
-                acceptStartAndAskUser(tgUser);
+            } else if (tgUser.getState().equals(TgState.SELECT_ALBUM)){
+                acceptAlbumAndSendingPhotos(tgUser,data);
+            } else if (tgUser.getState().equals(TgState.SELECT_TODO)
+                    ||tgUser.getState().equals(TgState.SELECT_COMMENT)
+            ||tgUser.getState().equals(TgState.SELECT_PHOTO)){
+                if (data.equals("orqaga")){
+                    acceptStartAndAskUser(tgUser);
+                }
             }
         }
     }
